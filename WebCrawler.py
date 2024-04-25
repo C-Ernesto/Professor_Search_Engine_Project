@@ -30,6 +30,7 @@ class WebCrawler:
             print("Database not connected successfully")
 
     def crawlerThread(self, con, num_targets=10, DEBUG=False):
+        num_sites_accessed = 0
         targets_found = 0
 
         while self.frontier:
@@ -42,12 +43,14 @@ class WebCrawler:
                 html = urlopen(url)
                 bs = BeautifulSoup(html.read(), 'html.parser')
 
+                num_sites_accessed += 1
+
                 # check if url is a target page
                 if self.target_page(bs, DEBUG):
-                    self.store_page(con, url, bs, True)
+                    self.store_page(con, targets_found, url, bs, True)
                     targets_found += 1
                 else:
-                    self.store_page(con, url, bs, False)
+                    self.store_page(con, (100 + num_targets + num_sites_accessed), url, bs, False)
 
                 # add url to visited
                 self.visited_links.append(url)
@@ -90,8 +93,9 @@ class WebCrawler:
                 print("not target page")
             return False
 
-    def store_page(self, con, url, bs, isTarget: bool):
+    def store_page(self, con, docId, url, bs, isTarget: bool):
         page = {
+            '_id': docId,
             'url': url,
             'html': str(bs),
             "istarget": isTarget
