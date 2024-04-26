@@ -29,7 +29,7 @@ class WebCrawler:
         except:
             print("Database not connected successfully")
 
-    def crawlerThread(self, con, num_targets=10, DEBUG=False):
+    def crawlerThread(self, con, num_targets=25, DEBUG=False):
         num_sites_accessed = 0
         targets_found = 0
 
@@ -50,8 +50,7 @@ class WebCrawler:
                     self.store_page(con, targets_found, url, bs, True)
                     targets_found += 1
                 else:
-                    self.store_page(con, (100 + num_targets + num_sites_accessed), url, bs, False)
-
+                    print("Not a target page")
                 # add url to visited
                 self.visited_links.append(url)
 
@@ -106,7 +105,7 @@ class WebCrawler:
         db = self.connectDataBase()
         webpage = db.webpage
 
-        self.crawlerThread(webpage, 10, DEBUG)
+        self.crawlerThread(webpage, 25, DEBUG)
 
 
 if __name__ == '__main__':
