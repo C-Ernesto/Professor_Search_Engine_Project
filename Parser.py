@@ -14,10 +14,11 @@ def parser():
         html_content = document['html']  
         soup = BeautifulSoup(html_content, 'html.parser')
         # Extract information with class "accolades", which contains "Areas of Search"
-        accolades_div = soup.find('div', class_='accolades')
-        if accolades_div:
-            print("Document #",counter)
-            print(accolades_div.get_text(separator='\n', strip=True))
+        accolades_divs = soup.find_all('div', class_='accolades')
+        if accolades_divs:
+            print("Document #", counter)
+            for accolades_div in accolades_divs:
+                print(accolades_div.get_text(separator='\n', strip=True))
             print()
         counter += 1
 if __name__ == "__main__":
