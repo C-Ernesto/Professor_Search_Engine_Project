@@ -50,7 +50,9 @@ class WebCrawler:
                     self.store_page(con, targets_found, url, bs, True)
                     targets_found += 1
                 else:
-                    print("Not a target page")
+                    # self.store_page(con, targets_found, url, bs, False)
+                    if DEBUG:
+                        print("Not a target page")
                 # add url to visited
                 self.visited_links.append(url)
 
