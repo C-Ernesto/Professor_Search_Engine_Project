@@ -1,5 +1,6 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from pymongo import MongoClient
+from collections import OrderedDict
 
 
 def connectDataBase():
@@ -20,16 +21,26 @@ def connectDataBase():
         print("Database not connected successfully")
 
 
-def create_inverted_index(docs):
+def create_inverted_index(docsDict):
+
+    # convert docs to ordered dict
+    docs = OrderedDict(docsDict)
+
     # convert documents to list
     corpus = list(docs.values())
 
+    # Create a CountVectorizer to get word counts
+    countVectorizer = CountVectorizer()
+    count_matrix = countVectorizer.fit_transform(corpus)
+    count_matrix_np = count_matrix.toarray()
+
     # Create TF-IDF vectorizer
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(corpus)
+    tfidfVectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidfVectorizer.fit_transform(corpus)
+    tfidf_matrix_np = tfidf_matrix.toarray()
 
     # Get terms
-    feature_names = vectorizer.get_feature_names_out()
+    feature_names = tfidfVectorizer.get_feature_names_out()
 
     inverted_index = {}
 
@@ -38,12 +49,13 @@ def create_inverted_index(docs):
     for i, term in enumerate(feature_names):
         inverted_index[term] = []
         for doc_id, text in docs.items():
-            tfidf_matrix_np = tfidf_matrix.toarray()
             tfidf = tfidf_matrix_np[doc_id][i]
+            count = count_matrix_np[doc_id][i].item()
             # only consider non-zero terms
             if tfidf > 0:
                 inverted_index[term].append({
                     "doc_id": doc_id,
+                    "count": count,
                     "tfidf": tfidf
                 })
 
@@ -56,6 +68,8 @@ def create_inverted_index(docs):
             "term": term,
             "documents": docs
         })
+
+    # print(inverted_index_document)
 
     return inverted_index_document
 
@@ -79,11 +93,3 @@ if __name__ == '__main__':
     }
 
     start_indexing(documents)
-
-    # inverted_index = create_inverted_index(documents)
-    #
-    # # Print inverted index
-    # for term, postings in inverted_index.items():
-    #     print(term + ":")
-    #     for posting in postings:
-    #         print(f"   Doc ID: {posting['doc_id']}, TF-IDF: {posting['tfidf']:.4f}")
