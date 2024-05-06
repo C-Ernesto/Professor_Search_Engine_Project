@@ -38,8 +38,18 @@ def parser():
             for accolades_div in accolades_divs:
                 # Replace '\n' with space ' '
                 text += accolades_div.get_text(separator=' ', strip=True)
+
+        # Extract information from left side
+        blurb = soup.find_all('div', {'class': 'blurb'})
+        if blurb:
+            for section in blurb:
+                text += section.get_text(separator=' ', strip=True)
+
         dict[doc_id].append({doc_id: text})
-    print(dict)
+
+    return dict
+
 
 if __name__ == "__main__":
-    parser()
+    txt = parser()
+    print(txt)
