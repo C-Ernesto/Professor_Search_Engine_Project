@@ -8,6 +8,8 @@ class Index:
         self.docsDict = docsDict
         self.countVectorizer = CountVectorizer()
         self.tfidfVectorizer = TfidfVectorizer()
+        self.count_matrix = []
+        self.tfidf_matrix = []
         self.inverted_index = {}
 
     def getCountVectorizer(self):
@@ -17,7 +19,13 @@ class Index:
         return self.tfidfVectorizer
 
     def getInvertedIndex(self):
-        return self.inverted_index
+        return self.inverted_index.copy()
+
+    def getCountMatrix(self):
+        return self.count_matrix.copy()
+
+    def getTfidfMatrix(self):
+        return self.tfidf_matrix.copy()
 
     def connectDataBase(self):
         # Create a database connection object using pymongo
@@ -47,13 +55,13 @@ class Index:
 
         # Create a CountVectorizer to get word counts
         # countVectorizer = CountVectorizer()
-        count_matrix = self.countVectorizer.fit_transform(corpus)
-        count_matrix_np = count_matrix.toarray()
+        self.count_matrix = self.countVectorizer.fit_transform(corpus)
+        count_matrix_np = self.count_matrix.toarray()
 
         # Create TF-IDF vectorizer
         # tfidfVectorizer = TfidfVectorizer()
-        tfidf_matrix = self.tfidfVectorizer.fit_transform(corpus)
-        tfidf_matrix_np = tfidf_matrix.toarray()
+        self.tfidf_matrix = self.tfidfVectorizer.fit_transform(corpus)
+        tfidf_matrix_np = self.tfidf_matrix.toarray()
 
         # Get terms
         feature_names = self.tfidfVectorizer.get_feature_names_out()
