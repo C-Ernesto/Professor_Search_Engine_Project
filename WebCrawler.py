@@ -49,10 +49,9 @@ class WebCrawler:
                 if self.target_page(bs, DEBUG):
                     self.store_page(con, targets_found, url, bs, True)
                     targets_found += 1
-                else:
+                # else:
                     # self.store_page(con, targets_found, url, bs, False)
-                    if DEBUG:
-                        print("Not a target page")
+
                 # add url to visited
                 self.visited_links.append(url)
 
@@ -91,7 +90,7 @@ class WebCrawler:
             return True
         except AttributeError as e:
             if DEBUG:
-                print("not target page")
+                print("Not target page")
             return False
 
     def store_page(self, con, docId, url, bs, isTarget: bool):
