@@ -1,3 +1,5 @@
+import re
+import string
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
 
@@ -44,6 +46,12 @@ def parser():
         if blurb:
             for section in blurb:
                 text += section.get_text(separator=' ', strip=True)
+
+        # remove encoding artifacts
+        text = text.replace('\xa0', '')
+
+        # remove punctuation from text
+        text = text.translate(str.maketrans('', '', string.punctuation))
 
         dict[doc_id].append({doc_id: text})
 
