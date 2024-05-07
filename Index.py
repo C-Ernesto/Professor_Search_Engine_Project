@@ -116,7 +116,7 @@ class Index:
         queryText = query
 
         # remove punctuation
-        queryText.translate(str.maketrans('', '', string.punctuation))
+        queryText = queryText.translate(str.maketrans('', '', string.punctuation))
 
         # stopping and stemming
         # vectorizer = CountVectorizer(stop_words='english', tokenizer=LemmaTokenizer())
