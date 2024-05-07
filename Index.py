@@ -1,6 +1,9 @@
+import string
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from pymongo import MongoClient
 from collections import OrderedDict
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 class Index:
 
@@ -43,7 +46,6 @@ class Index:
 
         except:
             print("Database not connected successfully")
-
 
     def create_inverted_index(self):
 
@@ -97,7 +99,6 @@ class Index:
 
         return inverted_index_document
 
-
     def start_indexing(self):
         db = self.connectDataBase()
         index = db.index
@@ -106,6 +107,46 @@ class Index:
 
         # store inverted index
         index.insert_many(inverted_index)
+
+    def printIndex(self):
+        for key, val in self.inverted_index.items():
+            print(key, ":", val)
+
+    def getDocumentRanking(self, query):
+        queryText = query
+
+        # remove punctuation
+        queryText.translate(str.maketrans('', '', string.punctuation))
+
+        # stopping and stemming
+        # vectorizer = CountVectorizer(stop_words='english', tokenizer=LemmaTokenizer())
+
+        # transform query to vector, also performs stopping and stemming
+        vector = self.tfidfVectorizer.transform([queryText])
+        # print(vectorizer.vocabulary_)
+        # print(vector.toarray())
+
+        # get cosine similarity
+        cosine_similarity_values = cosine_similarity(self.tfidf_matrix.toarray(), vector.toarray()).flatten()
+
+        # enumerate and sort to get doc ID of highest similarity
+        cosine_enum = list(enumerate(cosine_similarity_values))
+        ranking = sorted(cosine_enum, key=lambda x: x[1], reverse=True)
+        # print(ranking)
+
+        # get URL for the doc ID
+        db = self.connectDataBase()
+        webpage = db.webpage
+
+        count = 1
+        for DocID, val in ranking:
+            if count == 5:
+                break
+            url = webpage.find_one({"_id": DocID})['url']
+            print("%d. %s   |   Similarity: %f" % (count, url, val))
+            count += 1
+
+        return ranking
 
 
 if __name__ == '__main__':
@@ -118,5 +159,5 @@ if __name__ == '__main__':
 
     index = Index(documents)
     index.start_indexing()
-
-    #start_indexing(documents)
+    index.printIndex()
+    index.getDocumentRanking("The apple, slept behind the banana.")
