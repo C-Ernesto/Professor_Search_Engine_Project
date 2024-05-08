@@ -53,7 +53,7 @@ def parser():
         # remove punctuation from text
         text = text.translate(str.maketrans('', '', string.punctuation))
 
-        dict[doc_id].append({doc_id: text})
+        dict[doc_id] = text
 
     return dict
 
