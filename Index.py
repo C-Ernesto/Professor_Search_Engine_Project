@@ -3,18 +3,30 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from pymongo import MongoClient
 from collections import OrderedDict
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk import word_tokenize
+from nltk.stem import WordNetLemmatizer
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-nltk.download('stopwords')
-nltk.download('punkt')
+
+
+# nltk.download()
+
+
+class LemmaTokenizer:
+    def __init__(self):
+        self.wnl = WordNetLemmatizer()
+
+    def __call__(self, doc):
+        return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
+
 
 class Index:
 
     def __init__(self, docsDict):
         self.docsDict = docsDict
-        self.countVectorizer = CountVectorizer()
-        self.tfidfVectorizer = TfidfVectorizer()
+        self.countVectorizer = CountVectorizer(stop_words='english', tokenizer=LemmaTokenizer(), ngram_range=(1, 5))
+        self.tfidfVectorizer = TfidfVectorizer(stop_words='english', tokenizer=LemmaTokenizer(), ngram_range=(1, 5))
         self.count_matrix = []
         self.tfidf_matrix = []
         self.inverted_index = {}
@@ -60,6 +72,9 @@ class Index:
 
         # convert documents to list
         corpus = list(docs.values())
+
+        # preprocess text
+        # preprocessed_docs = {doc_id: self.preprocess_text(doc_text) for doc_id, doc_text in self.docsDict.items()}
 
         # Create a CountVectorizer to get word counts
         # countVectorizer = CountVectorizer()
@@ -111,15 +126,8 @@ class Index:
         stemmed_tokens = [self.stemmer.stem(token) for token in filtered_tokens]
         preprocessed_text = ' '.join(stemmed_tokens)
         return preprocessed_text
-    
 
     def start_indexing(self):
-        preprocessed_docs = {doc_id: self.preprocess_text(doc_text) for doc_id, doc_text in self.docsDict.items()}
-
-        # Print preprocessed documents
-        for doc_id, preprocessed_text in preprocessed_docs.items():
-            print(f"Preprocessed Document {doc_id}: {preprocessed_text}")
-
         db = self.connectDataBase()
         index = db.index
 
@@ -137,9 +145,6 @@ class Index:
 
         # remove punctuation
         queryText = queryText.translate(str.maketrans('', '', string.punctuation))
-
-        # stopping and stemming
-        # vectorizer = CountVectorizer(stop_words='english', tokenizer=LemmaTokenizer())
 
         # transform query to vector, also performs stopping and stemming
         vector = self.tfidfVectorizer.transform([queryText])
@@ -160,10 +165,10 @@ class Index:
 
         count = 1
         for DocID, val in ranking:
-            if count == 5:
-                break
             url = webpage.find_one({"_id": DocID})['url']
             print("%d. %s   |   Similarity: %f" % (count, url, val))
+            if count == 5:
+                break
             count += 1
 
         return ranking
@@ -180,4 +185,4 @@ if __name__ == '__main__':
     index = Index(documents)
     index.start_indexing()
     index.printIndex()
-    index.getDocumentRanking("The apple, slept behind the banana.")
+    index.getDocumentRanking("The apples, slept behind the bananas.")
