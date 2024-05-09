@@ -166,19 +166,24 @@ class Index:
         count = 1
         num = 1
         for DocID, val in ranking:
+            # truncate at similarity = 0
             if val == 0:
                 break
+
             url = webpage.find_one({"_id": DocID})['url']
+
             print("%d. %-40s  |  Similarity: %f" % (num, url, val))
             if count == 5:
                 cmd = input("Enter n for next page, enter anything else to run another query: ")
                 if cmd.lower() == 'n':
                     count = 0
                 else:
-                    print("\n"+"--------------------------------"*3+"\n")
                     break
             count += 1
             num += 1
+
+        # add line break
+        print("\n" + "--------------------------------" * 3 + "\n")
 
         return ranking
 
