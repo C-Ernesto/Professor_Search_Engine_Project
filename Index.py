@@ -183,7 +183,7 @@ class Index:
             num += 1
 
         # add line break
-        print("\n" + "--------------------------------" * 3 + "\n")
+        print("\n" + "================================" * 3 + "\n")
 
         return ranking
 
