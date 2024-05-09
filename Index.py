@@ -3,7 +3,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from pymongo import MongoClient
 from collections import OrderedDict
 from sklearn.metrics.pairwise import cosine_similarity
-
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+nltk.download('stopwords')
+nltk.download('punkt')
 
 class Index:
 
@@ -14,6 +18,8 @@ class Index:
         self.count_matrix = []
         self.tfidf_matrix = []
         self.inverted_index = {}
+        self.stop_words = set(stopwords.words('english'))
+        self.stemmer = PorterStemmer()
 
     def getCountVectorizer(self):
         return self.countVectorizer
@@ -99,7 +105,21 @@ class Index:
 
         return inverted_index_document
 
+    def preprocess_text(self, text):
+        tokens = nltk.word_tokenize(text)
+        filtered_tokens = [token for token in tokens if token.lower() not in self.stop_words]
+        stemmed_tokens = [self.stemmer.stem(token) for token in filtered_tokens]
+        preprocessed_text = ' '.join(stemmed_tokens)
+        return preprocessed_text
+    
+
     def start_indexing(self):
+        preprocessed_docs = {doc_id: self.preprocess_text(doc_text) for doc_id, doc_text in self.docsDict.items()}
+
+        # Print preprocessed documents
+        for doc_id, preprocessed_text in preprocessed_docs.items():
+            print(f"Preprocessed Document {doc_id}: {preprocessed_text}")
+
         db = self.connectDataBase()
         index = db.index
 
