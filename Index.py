@@ -18,7 +18,7 @@ class LemmaTokenizer:
         self.wnl = WordNetLemmatizer()
 
     def __call__(self, doc):
-        return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
+        return [self.wnl.lemmatize(t) for t in word_tokenize(doc) if t not in stopwords.words('english')]
 
 
 class Index:
