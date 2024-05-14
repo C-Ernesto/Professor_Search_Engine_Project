@@ -2,10 +2,13 @@ from WebCrawler import WebCrawler
 from Index import Index
 from Parser import parser
 
+import warnings
+warnings.filterwarnings("ignore")
+
 def main():
     # Step 1: Crawl the web (called only once)
     #crawler = WebCrawler("https://www.cpp.edu/engineering/ce/index.shtml")
-    #crawler.start_crawler()
+    #crawler.start_crawler(True)
 
     # Step 2: Parse crawled data (called only once)
     docsDict = parser()
