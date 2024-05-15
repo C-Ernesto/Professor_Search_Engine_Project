@@ -1,4 +1,4 @@
-# CS4250_Project
+![image](https://github.com/ybanez330/CS4250_Project/assets/98442235/46a035e6-b4a2-4dfb-bd43-84abe2836dfe)# CS4250_Project
 CS4250 Web Search and Recommender Systems Final Project. Web scraping, parsing, and extracting data from CPP Civil Engineering web page.
 
 ## Prerequisites
@@ -18,3 +18,4 @@ CS4250 Web Search and Recommender Systems Final Project. Web scraping, parsing, 
 5. Kevin Hoang
 
 ## Video Demo Link:
+https://www.youtube.com/watch?v=PahfyzhjzJs 
