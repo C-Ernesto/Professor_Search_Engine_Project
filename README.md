@@ -6,6 +6,9 @@ CS4250 Web Search and Recommender Systems Final Project. Web scraping, parsing, 
 - MongoDB
 - BeautifulSoup
 - pymongo
+- nltk
+- scikit-learn
+- urllib
 
 ## Team:
 1. Alondra Marin
